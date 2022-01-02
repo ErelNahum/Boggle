@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import font as tkfont
+from PIL import Image, ImageTk
 
 BGCOLOR = '#B0C4DE'
 TEXTCOLOR = '#002060'
@@ -45,6 +46,10 @@ class WelcomePage(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
         self.configure(background=BGCOLOR)
+
+        logo_img = ImageTk.PhotoImage(image=Image.open('logo.png').resize((200, 100), Image.ANTIALIAS))
+        panel = tk.Label(self, image=logo_img)
+        panel.place(x=0, y=0)
 
         hello_label = tk.Label(self, text="Welcome to Boggle!", font=controller.title_font, bg=BGCOLOR, fg=TEXTCOLOR)
         hello_label.pack(side="top", fill="x", pady=10)
