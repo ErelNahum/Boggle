@@ -1,6 +1,8 @@
+import time
 import tkinter as tk
 from tkinter import font as tkfont
 from PIL import Image, ImageTk
+from gui_helper import Timer
 
 BGCOLOR = '#B0C4DE'
 TEXTCOLOR = '#002060'
@@ -23,7 +25,7 @@ class BoggleApp(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (WelcomePage,): # put all pages!
+        for F in (WelcomePage, MainGamePage): # put all pages!
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -47,9 +49,14 @@ class WelcomePage(tk.Frame):
         self.controller = controller
         self.configure(background=BGCOLOR)
 
-        logo_img = ImageTk.PhotoImage(image=Image.open('logo.png').resize((200, 100), Image.ANTIALIAS))
-        panel = tk.Label(self, image=logo_img)
-        panel.place(x=0, y=0)
+
+        img = Image.open('logo.PNG')
+        img = img.resize((200,150))
+        logo_img = ImageTk.PhotoImage(image=img)
+
+        li = tk.Label(self, image=logo_img)
+        li.image = logo_img
+        li.pack()
 
         hello_label = tk.Label(self, text="Welcome to Boggle!", font=controller.title_font, bg=BGCOLOR, fg=TEXTCOLOR)
         hello_label.pack(side="top", fill="x", pady=10)
@@ -61,8 +68,32 @@ class WelcomePage(tk.Frame):
                                       font=controller.title_font, bg=BGCOLOR, fg=TEXTCOLOR)
         luck_label.pack(side='top', fill='x', pady=10)
 
-        start_button = tk.Button(self, text='Start Game', font=controller.title_font, bg='#c6c1b9', fg=TEXTCOLOR)
+
+        start_button = tk.Button(self, text='Start Game', font=controller.title_font, bg='#c6c1b9', fg=TEXTCOLOR, command=lambda: controller.show_frame('MainGamePage'))
         start_button.pack(side='top', fill='x', pady=10)
+
+
+class MainGamePage(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        self.configure(background=BGCOLOR)
+
+        self.timer = Timer()
+        self.timer_l = tk.Label(self, text=f'Remaining Time: {self.timer}', font=controller.title_font, bg=BGCOLOR, fg=TEXTCOLOR)
+        self.timer_l.pack(side='top', fill='x', pady=10)
+
+        self.update_timer()
+
+    def update_timer(self):
+        print(self.timer)
+        self.timer.dec()
+        print(self.timer)
+
+        self.timer_l.text = 'Remaining Time: ' + str(self.timer)
+        self.timer_l.pack(side='top', fill='x', pady=10)
+        #self.after(1000, self.update_timer())
+
 
 if __name__ == "__main__":
     app = BoggleApp()

@@ -46,8 +46,6 @@ def get_max_len_word(words):
 def find_length_n_paths(n, board, words):
     if n > get_max_len_word(words) or n <= 0:
         return []
-    with open(SAVE_PATH_FILE, "w") as myfile:
-        myfile.write("")
 
     all_paths = []
     for x_index in range(len(board[0])):

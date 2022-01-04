@@ -56,6 +56,6 @@ if __name__ == "__main__":
     # print(find_length_n_words(1, board, words))
     # print(find_length_n_paths(3, board, words))
     # print(find_length_n_words(4, board, words))
-    print(find_length_n_paths(6, board, words))
+    print(find_length_n_paths(5, board, words))
 
 
