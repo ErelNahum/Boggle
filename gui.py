@@ -3,13 +3,13 @@ import tkinter as tk
 from typing import List, Tuple, Dict
 from PIL import Image, ImageTk
 from tkinter import font as tkfont
-from gui_helper import Timer
+from gui_helper import Timer, Misc
 from boggle_board_randomizer import randomize_board
 DEFAULT_FONT = ('Helvetica', 18)  # tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
 BGCOLOR = '#B0C4DE'
 TEXTCOLOR = '#002060'
 BT_COLOR = 'blue'
-BT_SELECTED_COLOR = 'red'
+BT_SELECTED_COLOR = 'gray'
 
 BUTTON_STYLE = {"font": ("Courier", 30),
                 "borderwidth": 1,
@@ -37,44 +37,113 @@ class GUI:
 
     def on_start(self, f):
         f.pack_forget()
-        f = GamePage(self.__root, self.__board, bg=BGCOLOR)
+        f = GamePage(self.__root, self.__board, self.__root.destroy, bg=BGCOLOR)
         f.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
     def run(self):
         self.__main_window.mainloop()
+        
+
+def correct_word(word: str) -> bool:
+    import random
+    """returns if the word is correct"""
+    return random.randint(0, 1) == 1
 
 
 class GamePage(tk.Frame):
-    def __init__(self, root, board, font=DEFAULT_FONT, **kwargs):
+    def __init__(self, root, board, destroy, font=DEFAULT_FONT, **kwargs):
         tk.Frame.__init__(self, root, **kwargs)
         self.__root = root
+        self.__found = []
+        self.__is_first = True
         self.__timer = Timer()
+        self.__selected = []
+        root.after(1000, self.tick, destroy)
         self.__path_s_var = tk.StringVar()
+        self.__path_trace = ''
         self.__current_path = tk.Label(root, textvariable=self.__path_s_var, font=DEFAULT_FONT, bg=BGCOLOR)
         self.__current_path.pack(**PACK_VARS)
-        self.update_path_view('hee')
+        self.update_path_view()
         select = lambda e : self.select(e)
-        f = GridPage(root, board, select, font, **kwargs)
-        f.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-        s = WordsListPage(root, **kwargs)
-        s.add_word('hello')
-        s.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        release = lambda e: self.release(e)
+        self.__f = GridPage(root, board, select, release, font, **kwargs)
+        self.__f.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        self.__s = WordsListPage(root, **kwargs)
+        self.__s.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         self.__timer_s_var = tk.StringVar()
         self.__timer_s_var.set(str(self.__timer))
         timer = tk.Label(root, textvariable=self.__timer_s_var, font=DEFAULT_FONT, bg=BGCOLOR, fg=TEXTCOLOR)
         timer.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-        submit = tk.Button(root, text='SUBMIT', font=DEFAULT_FONT)
-        submit.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        self.__score_s_var = tk.StringVar()
+        self.__score_s_var.set('0')
+        self.__score = tk.Label(root, textvariable=self.__score_s_var, font=DEFAULT_FONT, bg=BGCOLOR)
+        self.__score.pack(**PACK_VARS)
 
-    def update_path_view(self, word):
-        self.__path_s_var.set(word)
+    def tick(self, destroy):
+        self.__timer.dec()
+        if self.__timer.time == 0:
+            destroy()
+        self.update_timer()
+        self.__root.after(1000, self.tick, destroy)
+    
+    def update_timer(self):
+        self.__timer_s_var.set(str(self.__timer))
+
+    def update_path_view(self):
+        self.__path_s_var.set(self.__path_trace)
 
     def select(self, event):
         widget = self.__root.winfo_containing(event.x_root, event.y_root)
         if isinstance(widget, tk.Button):
-            widget['bg'] = 'green'
+            coor = widget.extra
+            if self.__is_first or (coor not in self.__selected and coor in list(Misc.neighbors_in_board(self.__selected[-1]))):
+                widget['bg'] = 'gray'
+                self.__path_trace += widget.cget('text')
+                self.update_path_view()
+                self.__selected.append(coor)
+                self.__is_first = False
+    
+    def add_score(self, how_many_points: int):
+        current_score = int(self.__score_s_var.get())
+        self.__score_s_var.set(str(current_score + how_many_points))
+    
+    def release(self, event):
+        word = self.__path_trace
+        if self.__path_trace:
+            if correct_word(word):
+                if self.__path_s_var.get() not in self.__found:
+                    self.__s.add_word(self.__path_s_var.get())
+                    self.__found.append(self.__path_s_var.get())
+                    self.add_score(len(self.__path_trace)**2)
+                color = 'green'
+            else:
+                color = 'red'
+            self.colorize_buttons(color, all=False, buttons=self.buttons_of_indices(self.__selected))
+            self.__root.after(300, self.colorize_buttons, BT_COLOR)
+            
+            self.__path_trace = ''
+            self.update_path_view()
+            self.__selected = []
+            self.__is_first = True
+
+    def colorize_buttons(self, color, all=True, buttons=[]):
+        if all:
+            for r in self.__f.buttons:
+                for b in r:
+                    b.configure(bg=color)
+        else:
+            for b in buttons:
+                b.configure(bg=color)
+    
+    def buttons_of_indices(self, coors):
+        for coor in coors:
+            yield self.__f.buttons[coor[1]][coor[0]]
+
+                
+        
+
 
 
 class WordsListPage(tk.Frame):
@@ -93,11 +162,12 @@ class WordsListPage(tk.Frame):
 
 
 class GridPage(tk.Frame):
-    def __init__(self, root, board, select, font=DEFAULT_FONT, **kwargs):
+    def __init__(self, root, board, select, release, font=DEFAULT_FONT, **kwargs):
         tk.Frame.__init__(self, root, **kwargs)
         self._root = root
-        self.__buttons = self.__make_buttons(board)
+        self.buttons = self.__make_buttons(board)
         root.bind('<B1-Motion>', select)
+        root.bind('<ButtonRelease-1>', release)
 
 
     def __make_buttons(self, board):
@@ -114,6 +184,7 @@ class GridPage(tk.Frame):
 
     def __make_button(self, name, r, c):
         button = tk.Button(self, text=name, **BUTTON_STYLE)
+        button.extra = (c, r)
         button.grid(row=r, column=c, sticky=tk.NSEW, padx=10, pady=10)
         return button
 
@@ -146,5 +217,6 @@ class WelcomePage(tk.Frame):
 
 
 if __name__ == '__main__':
-    t = GUI(randomize_board())
-    t.run()
+    while True:
+        t = GUI(randomize_board())
+        t.run()

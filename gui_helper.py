@@ -6,6 +6,16 @@ class Misc:
     @staticmethod
     def add_coors(coor1 : Tuple[int, int], coor2: Tuple[int, int]) -> Tuple[int, int]:
         return coor1[0] + coor2[0], coor1[1] + coor2[1]
+    
+    @staticmethod
+    def neighbors_in_board(coor):
+        if not coor:
+            return []
+        for delta_x in (-1, 0, 1):
+            for delta_y in (-1, 0, 1):
+                g = Misc.add_coors(coor, (delta_x, delta_y))
+                if Game.in_board(g):
+                    yield g
 
 
 class Node:
@@ -64,7 +74,7 @@ class Path:
 
 class Timer:
     def __init__(self):
-        self.time = 180  # 3 minutes
+        self.time = 5  # 3 minutes
 
     def dec(self):
         self.time -= 1
