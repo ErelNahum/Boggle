@@ -1,12 +1,13 @@
-import sys
-
 from gui import GUI
 from boggle_board_randomizer import randomize_board
 
-def play_again():
-    my_game = GUI(randomize_board(), play_again, sys.exit)
-    my_game.run()
+
+def new_game(previous=None):
+    if previous is not None:
+        previous.destroy()
+    g = GUI(randomize_board(), new_game)
+    g.run()
 
 
 if __name__ == '__main__':
-    play_again()
+    new_game()
