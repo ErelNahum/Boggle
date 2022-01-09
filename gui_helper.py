@@ -1,5 +1,4 @@
-from typing import List, Tuple
-from exceptions import UnvalidMove
+from typing import Tuple
 
 
 class Misc:
