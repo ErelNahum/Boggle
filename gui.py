@@ -63,7 +63,7 @@ class GamePage(tk.Frame):
         self.__is_first = True
         self.__timer = Timer()
         self.__selected = []
-        root.after(1000, self.tick, destroy)
+        root.after(1000, self.tick, self.destroy)
         self.__path_s_var = tk.StringVar()
         self.__path_trace = ''
         self.__current_path = tk.Label(root, textvariable=self.__path_s_var, font=DEFAULT_FONT, bg=BGCOLOR)
