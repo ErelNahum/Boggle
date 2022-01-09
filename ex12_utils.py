@@ -22,6 +22,9 @@ DICT_FILE = "boggle_dict.txt"
 #                              Finder Class                                  #
 ##############################################################################
 class Finder:
+    """
+    this class is a helper class to find paths of words in a specific board
+    """
     def __init__(self, board, words, root):
         self.board = board
         self.paths = []
@@ -29,7 +32,16 @@ class Finder:
         self.root = root
 
     def find_length_n_words_path_from_cell(self, start_cell, n, path, is_check_word):
+        """
+            this function finds length n paths/words from a certain cell in a board that are legal
+            param: start_cell - the cell to start the path search from
+            param: n - the length of path/word that is searched
+            param: path - a helper meanwhile path recursive param
+            param: is_check_word - a boolean param that decides whether the function searches length n words or paths
+            return: a list of paths of legal words in the length of n from a certain cell
+        """
         if n > 1:
+            # check if the word created by meanwhile path can even create a word within all the words in dict
             path_word = path_2_word(self.board, path)
             if not trie.find_prefix(self.root, path_word)[1]:
                 return ""
@@ -81,7 +93,14 @@ class Finder:
 ##############################################################################
 #                                 Functions                                  #
 ##############################################################################
+
+
 def initialize_trie(words):
+    """
+        this function gets a list of words and creates a letter tree out of them
+        param: words - a list of words to create word tree
+        return: a root object of the letter tree
+    """
     root = trie.TrieNode('*')
     for word in words:
         trie.add(root, word)
@@ -90,11 +109,24 @@ def initialize_trie(words):
 
 
 def get_word_list(file_name = DICT_FILE):
+    """
+        this function gets a file name and reads all the data from the file
+        param: file_name - the file to extract data from
+        return: a string of all the data
+    """
     with open(file_name, "r") as myfile:
         return myfile.read()
 
 
 def is_valid_path(board, path, words):
+    """
+        this function gets a board, path in it and words and returns whether the path is legal (is acctually a walkable
+        path inside the board limits and represents a legal word
+        param: board - a board of letters, list of lists
+        param: path - the path to check, a list of tuple coordinates
+        param: words - a list of legal words
+        return: an str of the word tha path represents if the path is legal and None if it isn't
+    """
     word = ""
     for path_node_index in range(len(path)):
         check_path = deepcopy(path)
@@ -120,6 +152,9 @@ def is_valid_path(board, path, words):
 
 
 def get_max_len_word(words):
+    """
+        this function gets a list of words and returns the length of the longest word
+    """
     max_len = 0
     for word in words:
         if len(word) > max_len:
@@ -128,6 +163,14 @@ def get_max_len_word(words):
 
 
 def find_length_n_paths(n, board, words, root = None):
+    """
+        this function gets a board and returns a list of length n legal paths in it that represent legal words
+        param: n - the length of paths to find
+        param: board - a board of letters, list of lists
+        param: words - a list of legal words
+        param: root - a root object of a letter tree of the words, this is a helper param to help the running time of the program
+        return: a list of length n legal paths that represent legal words in the board
+    """
     if root is None:
         root = initialize_trie(words)
 
@@ -155,6 +198,9 @@ def find_length_n_paths(n, board, words, root = None):
 
 
 def path_2_word(board, path):
+    """
+        this function gets a board of letters and a path in it and returns the word represented by the path
+    """
     word = ""
     for cell in path:
         word += board[cell[0]][cell[1]]
@@ -162,6 +208,14 @@ def path_2_word(board, path):
 
 
 def find_length_n_words(n, board, words, root = None):
+    """
+        this function gets a board and returns a list of length n legal words in it
+        param: n - the length of paths to find
+        param: board - a board of letters, list of lists
+        param: words - a list of legal words
+        param: root - a root object of a letter tree of the words, this is a helper param to help the running time of the program
+        return: a list of length n legal words in the board
+    """
     if root is None:
         root = initialize_trie(words)
 
@@ -188,6 +242,16 @@ def find_length_n_words(n, board, words, root = None):
 
 
 def max_score_paths(board, words, root = None):
+    """
+        this function gets a board and returns a list of paths that represent all the words in the board when each path
+        is the longest path possible to get to the word. in a certain board there could be several paths to get to the
+        same word.
+        param: board - a board of letters, list of lists
+        param: words - a list of legal words
+        param: root - a root object of a letter tree of the words, this is a helper param to help the running time of the program
+        return: a list of paths that represent all the words in the board when each path is the longest path possible
+        to get to the word
+    """
     if root is None:
         root = initialize_trie(words)
 
