@@ -1,6 +1,8 @@
 import random
 from ex12_utils import *
+import time
 
+DICT_FILE = "boggle_dict.txt"
 BOARD_SIZE = 4
 LETTERS = [
     ['A', 'E', 'A', 'N', 'E', 'G'],
@@ -22,6 +24,7 @@ LETTERS = [
 ]
 
 
+
 def randomize_board(dice_list=LETTERS):
     dice_indices = list(range(len(dice_list)))
     random.shuffle(dice_indices)
@@ -40,22 +43,14 @@ def randomize_board(dice_list=LETTERS):
 if __name__ == "__main__":
     from pprint import pprint
     board = randomize_board()
-    pprint(board)
-    # path_node_x = int(input("Enter Path Node X: "))
-    # path_node_y = int(input("Enter Path Node Y: "))
-    # path_node = [(path_node_y, path_node_x)]
-    # print(path_node)
-    # while ((-1, -1) not in path_node):
-    #     path_node_x = int(input("Enter Path Node X: "))
-    #     path_node_y = int(input("Enter Path Node Y: "))
-    #     path_node.append((path_node_y, path_node_x))
-    #
-    # path_node.remove((-1, -1))
-    words = get_word_list("boggle_dict.txt").split()
+    for line in board:
+        print(line)
+    # pprint(board)
 
-    # print(find_length_n_words(1, board, words))
-    # print(find_length_n_paths(3, board, words))
-    # print(find_length_n_words(4, board, words))
-    print(find_length_n_paths(5, board, words))
+
+    words = get_word_list(DICT_FILE).split()
+
+    print(max_score_paths(board, words))
+
 
 
