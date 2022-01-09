@@ -22,11 +22,14 @@ PACK_VARS = {'side': tk.TOP, 'fill': tk.BOTH, 'expand': True}
 class GUI:
     _buttons: Dict[str, tk.Button] = {}
 
-    def __init__(self, board: List[List[str]]):
+    def __init__(self, board: List[List[str]], again, q):
         self.__root = tk.Tk()
         self.__root.title('Boggle by Erel & Fishman')
         self.__root.geometry('1000x600')
         self.__root.resizable(False, False)
+
+        self.__again = again
+        self.__q = q
 
         self.__board = board
 
@@ -37,7 +40,7 @@ class GUI:
 
     def on_start(self, f):
         f.pack_forget()
-        f = GamePage(self.__root, self.__board, self.__root.destroy, bg=BGCOLOR)
+        f = GamePage(self.__root, self.__board, self.__again, self.__q, bg=BGCOLOR)
         f.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
     def run(self):
@@ -51,14 +54,16 @@ def correct_word(word: str) -> bool:
 
 
 class GamePage(tk.Frame):
-    def __init__(self, root, board, destroy, font=DEFAULT_FONT, **kwargs):
+    def __init__(self, root, board, again, q, font=DEFAULT_FONT, **kwargs):
         tk.Frame.__init__(self, root, **kwargs)
+        self.__again = again
+        self.__q = q
         self.__root = root
         self.__found = []
         self.__is_first = True
         self.__timer = Timer()
         self.__selected = []
-        root.after(1000, self.tick, destroy)
+        root.after(1000, self.tick, self.destroy)
         self.__path_s_var = tk.StringVar()
         self.__path_trace = ''
         self.__current_path = tk.Label(root, textvariable=self.__path_s_var, font=DEFAULT_FONT, bg=BGCOLOR)
@@ -80,6 +85,9 @@ class GamePage(tk.Frame):
         self.__score_s_var.set('0')
         self.__score = tk.Label(root, textvariable=self.__score_s_var, font=DEFAULT_FONT, bg=BGCOLOR)
         self.__score.pack(**PACK_VARS)
+
+    def destroy(self) -> None:
+        self.__again()
 
     def tick(self, destroy):
         self.__timer.dec()
@@ -214,6 +222,21 @@ class WelcomePage(tk.Frame):
         start_button = tk.Button(self, text='Start Game', font=font, bg='#c6c1b9', fg=TEXTCOLOR,
                                  command=lambda: on_start(self))
         start_button.pack(side='top', fill='x', pady=10)
+
+
+class PlayAgainPage(tk.Frame):
+    def __init__(self, root, again, q, font=DEFAULT_FONT, **kwargs):
+        tk.Frame.__init__(self, root, **kwargs)
+        self._root = root
+
+        l = tk.Label(self, text="GG. Do you want to play again?", font=font, bg=BGCOLOR, fg=TEXTCOLOR)
+        l.pack(**PACK_VARS)
+
+        yes = tk.Button(self, text='Play Again', font=font, bg='#c6c1b9', fg=TEXTCOLOR, command=again)
+        yes.pack(**PACK_VARS)
+
+        no = tk.Button(self, text='Exit', font=font, bg='#c6c1b9', fg=TEXTCOLOR, command=q)
+        no.pack(**PACK_VARS)
 
 
 if __name__ == '__main__':
