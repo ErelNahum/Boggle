@@ -1,24 +1,26 @@
+##############################################################################
+# FILE: ex11.py
+# WRITER: Yuval Fishman , yuvalfishman , 325711398
+# EXERCISE: Intro2cs ex11 2021-2022
+# DESCRIPTION:a binary tree file that identifies illness from symptoms
+##############################################################################
+
+##############################################################################
+#                                   Imports                                  #
+##############################################################################
 from copy import deepcopy
 import trie
 import itertools
 
-
+##############################################################################
+#                                 Constants                                  #
+##############################################################################
 DICT_FILE = "boggle_dict.txt"
 
 
-def initialize_trie(words):
-    root = trie.TrieNode('*')
-    for word in words:
-        trie.add(root, word)
-
-    return root
-
-
-def get_word_list(file_name):
-    with open(file_name, "r") as myfile:
-        return myfile.read()
-
-
+##############################################################################
+#                              Finder Class                                  #
+##############################################################################
 class Finder:
     def __init__(self, board, words, root):
         self.board = board
@@ -75,6 +77,21 @@ class Finder:
 
         elif n > 0:
             return self.paths.append(path)
+
+##############################################################################
+#                                 Functions                                  #
+##############################################################################
+def initialize_trie(words):
+    root = trie.TrieNode('*')
+    for word in words:
+        trie.add(root, word)
+
+    return root
+
+
+def get_word_list(file_name):
+    with open(file_name, "r") as myfile:
+        return myfile.read()
 
 
 def is_valid_path(board, path, words):
@@ -192,7 +209,6 @@ def max_score_paths(board, words, root = None):
                 print(word)
                 max_score_words[word] = path
 
-    print(max_score_words)
     max_score_path = []
     for path in max_score_words.values():
         max_score_path.append(path)
