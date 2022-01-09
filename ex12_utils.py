@@ -5,6 +5,7 @@ import itertools
 
 DICT_FILE = "boggle_dict.txt"
 
+
 def initialize_trie():
     words = get_word_list(DICT_FILE).split()
     root = trie.TrieNode('*')
@@ -13,14 +14,16 @@ def initialize_trie():
 
     return root
 
+
 def get_word_list(file_name):
     with open(file_name, "r") as myfile:
         return myfile.read()
 
-if __name__ == "__main__":
-    ROOT = initialize_trie()
 
-class Finder():
+ROOT = initialize_trie()
+
+
+class Finder:
     def __init__(self, board, words, root):
         self.board = board
         self.paths = []
@@ -64,7 +67,6 @@ class Finder():
                 new_cell = (start_x + 1, start_y - 1)
                 cells_to_append.append(new_cell)
 
-
             for cell in cells_to_append:
                 if cell not in path:
                     new_path = deepcopy(path)
@@ -97,16 +99,6 @@ def is_valid_path(board, path, words):
         return None
 
 
-def write_in_file(file_name, to_write):
-    allready_in_file = get_word_list(file_name)
-    to_write = str(to_write)
-    with open(file_name, "w") as myfile:
-        if allready_in_file is not None:
-            to_write = allready_in_file + "!" + to_write
-        if to_write is not None:
-            myfile.write(to_write)
-
-
 def get_max_len_word(words):
     max_len = 0
     for word in words:
@@ -116,6 +108,7 @@ def get_max_len_word(words):
 
 
 def find_length_n_paths(n, board, words):
+    global ROOT
     root = ROOT
     if n > get_max_len_word(words) or n <= 0:
         return []
@@ -140,10 +133,6 @@ def find_length_n_paths(n, board, words):
     return legal_paths
 
 
-def flatten(t):
-    return [item for sublist in t for item in sublist]
-
-
 def path_2_word(board, path):
     word = ""
     for cell in path:
@@ -152,6 +141,7 @@ def path_2_word(board, path):
 
 
 def find_length_n_words(n, board, words):
+    global ROOT
     root = ROOT
     if n > get_max_len_word(words) or n <= 0:
         return []
@@ -169,9 +159,7 @@ def find_length_n_words(n, board, words):
     legal_paths = []
 
     for path in all_paths:
-        word = ""
-        for cell in path:
-            word += board[cell[0]][cell[1]]
+        word = path_2_word(board, path)
         if word in words:
             legal_paths.append(path)
 
@@ -188,9 +176,7 @@ def max_score_paths(board, words):
 
     max_score_words = {}
     for path in all_paths:
-        word = ""
-        for cell in path:
-            word += board[cell[0]][cell[1]]
+        word = path_2_word(board, path)
         if word not in max_score_words.keys():
             max_score_words[word] = path
         else:
@@ -205,5 +191,3 @@ def max_score_paths(board, words):
         max_score_path.append(path)
 
     return max_score_path
-
-
