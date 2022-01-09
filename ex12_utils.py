@@ -6,8 +6,7 @@ import itertools
 DICT_FILE = "boggle_dict.txt"
 
 
-def initialize_trie():
-    words = get_word_list(DICT_FILE).split()
+def initialize_trie(words):
     root = trie.TrieNode('*')
     for word in words:
         trie.add(root, word)
@@ -18,9 +17,6 @@ def initialize_trie():
 def get_word_list(file_name):
     with open(file_name, "r") as myfile:
         return myfile.read()
-
-
-ROOT = initialize_trie()
 
 
 class Finder:
@@ -84,10 +80,18 @@ class Finder:
 def is_valid_path(board, path, words):
     word = ""
     for path_node_index in range(len(path)):
+        check_path = deepcopy(path)
+        del check_path[path_node_index]
         path_node = path[path_node_index]
+        if path_node in check_path:
+            return None
+
+        if path_node[0] < 0 or path_node[1] < 0 or path_node[0] > len(board)-1 or path_node[1] > len(board)-1:
+            return None
+
         if path_node_index > 0:
-            prev_node = path[path_node_index-1]
-            if path_node[0] != prev_node[0] and path_node[1] != prev_node[1]:
+            prev_node = path[path_node_index - 1]
+            if abs(prev_node[0] - path_node[0]) > 1 or abs(prev_node[1] - path_node[1]) > 1:
                 return None
 
         word += board[path_node[0]][path_node[1]]
@@ -106,9 +110,10 @@ def get_max_len_word(words):
     return max_len
 
 
-def find_length_n_paths(n, board, words):
-    global ROOT
-    root = ROOT
+def find_length_n_paths(n, board, words, root = None):
+    if root is None:
+        root = initialize_trie(words)
+
     if n > get_max_len_word(words) or n <= 0:
         return []
 
@@ -139,9 +144,10 @@ def path_2_word(board, path):
     return word
 
 
-def find_length_n_words(n, board, words):
-    global ROOT
-    root = ROOT
+def find_length_n_words(n, board, words, root = None):
+    if root is None:
+        root = initialize_trie(words)
+
     if n > get_max_len_word(words) or n <= 0:
         return []
 
@@ -150,8 +156,7 @@ def find_length_n_words(n, board, words):
         for y_index in range(len(board)):
             start_cell = (x_index, y_index)
             i = n
-            if board[start_cell[0]][start_cell[1]] in words:
-                i = i - len(board[start_cell[0]][start_cell[1]])+1
+            i = i - len(board[start_cell[0]][start_cell[1]])+1
             finder.find_length_n_words_path_from_cell(start_cell, i, [start_cell], True)
 
     all_paths = finder.paths
@@ -165,13 +170,16 @@ def find_length_n_words(n, board, words):
     return legal_paths
 
 
-def max_score_paths(board, words):
+def max_score_paths(board, words, root = None):
+    if root is None:
+        root = initialize_trie(words)
+
     word_max = get_max_len_word(words)
     path_max = len(board) * len(board[0])
     all_paths = []
     for i in range(min(path_max, word_max)):
-        all_paths.extend(find_length_n_paths(i, board, words))
-        all_paths.extend(find_length_n_words(i, board, words))
+        all_paths.extend(find_length_n_paths(i, board, words, root))
+        all_paths.extend(find_length_n_words(i, board, words, root))
 
     max_score_words = {}
     for path in all_paths:
