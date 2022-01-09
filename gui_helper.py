@@ -17,61 +17,6 @@ class Misc:
                 if Game.in_board(g):
                     yield g
 
-
-class Node:
-    def __init__(self, value=None, next=None):
-        self.value = value
-        self.next = next
-
-    @staticmethod
-    def list_to_node(p: List):
-        if not p:
-            return None
-        return Node(p[0], Node.list_to_node(p[1:]))
-
-    def to_list(self):
-        if self.next is None:
-            return []
-        return [self.value] + self.next.to_list()
-
-
-class Path:
-
-    def __init__(self, data=None):
-        if data is None:
-            self.pointer = None
-            self.length = 0
-        else:
-            self.pointer = Node.list_to_node(data)
-            self.length = len(data)
-
-    def choose_coor(self, coor):
-        if coor not in self.neighbors_in_board():
-            raise UnvalidMove
-        self.pointer = Node(coor, self.pointer)
-
-    def to_list(self):
-        return self.pointer.to_list()
-
-    def selected(self):
-        return self.to_list()
-
-    @property
-    def last_coor(self):
-        return self.pointer.value
-
-    def neighbors_in_board(self):
-        for delta_x in (-1, 0, 1):
-            for delta_y in (-1, 0, 1):
-                manipulation_coor = delta_x, delta_y
-                coor = Misc.add_coors(self.last_coor, manipulation_coor)
-                if Game.in_board(coor):
-                    yield coor
-
-    def possible_moves(self):
-        return [coor for coor in self.neighbors_in_board() if coor not in self.to_list()]
-
-
 class Timer:
     def __init__(self):
         self.time = 180  # 3 minutes
@@ -96,9 +41,6 @@ class Timer:
 
 
 class Game:
-    def __init__(self):
-        self.__current_path = Path()
-
     @staticmethod
     def in_board(coordinate: Tuple[int, int]):
         x, y = coordinate
