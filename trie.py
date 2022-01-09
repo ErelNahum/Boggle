@@ -92,20 +92,3 @@ def find_word(root, word, n=0):
             found_a_fit = found_a_fit or find_word(child, word, n + 1)
 
     return found_a_fit
-
-
-def get_word_list(file_name):
-    with open(file_name, "r") as myfile:
-        return myfile.read()
-
-
-if __name__ == "__main__":
-    root = TrieNode('*')
-
-    words = get_word_list("boggle_dict.txt")
-    words = words.split()
-    for word in words:
-        add(root, word)
-
-    word = "OOPHYTE"
-    print(find_prefix(root, word))

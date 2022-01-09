@@ -30,7 +30,6 @@ class Finder:
         self.words = words
         self.root = root
 
-
     def find_length_n_words_path_from_cell(self, start_cell, n, path, is_check_word):
         if n > 1:
             path_word = path_2_word(self.board, path)
