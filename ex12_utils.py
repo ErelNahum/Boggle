@@ -17,7 +17,8 @@ def get_word_list(file_name):
     with open(file_name, "r") as myfile:
         return myfile.read()
 
-ROOT = initialize_trie()
+if __name__ == "__main__":
+    ROOT = initialize_trie()
 
 class Finder():
     def __init__(self, board, words, root):
@@ -62,7 +63,6 @@ class Finder():
             if start_y > 0 and start_x < len(self.board[0]) - 1:
                 new_cell = (start_x + 1, start_y - 1)
                 cells_to_append.append(new_cell)
-
 
 
             for cell in cells_to_append:
