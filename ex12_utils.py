@@ -110,8 +110,10 @@ def get_max_len_word(words):
     return max_len
 
 
-def find_length_n_paths(n, board, words):
-    root = initialize_trie(words)
+def find_length_n_paths(n, board, words, root = None):
+    if root is None:
+        root = initialize_trie(words)
+
     if n > get_max_len_word(words) or n <= 0:
         return []
 
@@ -142,8 +144,10 @@ def path_2_word(board, path):
     return word
 
 
-def find_length_n_words(n, board, words):
-    root = initialize_trie(words)
+def find_length_n_words(n, board, words, root = None):
+    if root is None:
+        root = initialize_trie(words)
+
     if n > get_max_len_word(words) or n <= 0:
         return []
 
@@ -166,13 +170,16 @@ def find_length_n_words(n, board, words):
     return legal_paths
 
 
-def max_score_paths(board, words):
+def max_score_paths(board, words, root = None):
+    if root is None:
+        root = initialize_trie(words)
+
     word_max = get_max_len_word(words)
     path_max = len(board) * len(board[0])
     all_paths = []
     for i in range(min(path_max, word_max)):
-        all_paths.extend(find_length_n_paths(i, board, words))
-        all_paths.extend(find_length_n_words(i, board, words))
+        all_paths.extend(find_length_n_paths(i, board, words, root))
+        all_paths.extend(find_length_n_words(i, board, words, root))
 
     max_score_words = {}
     for path in all_paths:
