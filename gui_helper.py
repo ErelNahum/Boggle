@@ -74,7 +74,7 @@ class Path:
 
 class Timer:
     def __init__(self):
-        self.time = 5  # 3 minutes
+        self.time = 180  # 3 minutes
 
     def dec(self):
         self.time -= 1
