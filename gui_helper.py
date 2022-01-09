@@ -16,9 +16,14 @@ class Misc:
                 if Game.in_board(g):
                     yield g
 
+    @staticmethod
+    def correct_word(word):
+        import random
+        return random.randint(0, 1) == 1
+
 class Timer:
     def __init__(self):
-        self.time = 6  # 3 minutes
+        self.time = 180  # 3 minutes
 
     def dec(self):
         self.time -= 1
