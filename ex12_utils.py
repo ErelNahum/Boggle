@@ -89,7 +89,7 @@ def initialize_trie(words):
     return root
 
 
-def get_word_list(file_name):
+def get_word_list(file_name = DICT_FILE):
     with open(file_name, "r") as myfile:
         return myfile.read()
 

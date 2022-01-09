@@ -1,4 +1,5 @@
 from typing import Tuple
+from ex12_utils import *
 
 
 class Misc:
@@ -18,12 +19,12 @@ class Misc:
 
     @staticmethod
     def correct_word(word):
-        import random
-        return random.randint(0, 1) == 1
+        words = get_word_list().split()
+        return word in words
 
 class Timer:
     def __init__(self):
-        self.time = 180  # 3 minutes
+        self.time = 8  # 3 minutes
 
     def dec(self):
         self.time -= 1
