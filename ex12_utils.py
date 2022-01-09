@@ -1,8 +1,8 @@
 ##############################################################################
-# FILE: ex11.py
-# WRITER: Yuval Fishman , yuvalfishman , 325711398
-# EXERCISE: Intro2cs ex11 2021-2022
-# DESCRIPTION:a binary tree file that identifies illness from symptoms
+# FILE: ex12.py
+# WRITER: Yuval Fishman, yuvalfishman , 325711398. Erel Nahum,
+# EXERCISE: Intro2cs ex12 2021-2022
+# DESCRIPTION:a file that realizes functions that contend with identifying words
 ##############################################################################
 
 ##############################################################################
@@ -42,6 +42,14 @@ class Finder:
         """
         if n > 1:
             # check if the word created by meanwhile path can even create a word within all the words in dict
+            # this part is realized by a tree of letters that represent all the words inside the dict. it is realized
+            # like that so the computer would not have to check all the words inside the dict to determine whether
+            # a certain combination of letters has the potential to create a word.
+
+            # footnote - this tree is not truly nescecery for this perticullar board (4*4) and dict of words because
+            # there aren't enough paths inside the board and too many words inside the dict so it would be worth it
+            # to even create the tree (it takes time to create a tree of 20 thousand words). however, if you'd make the
+            # board much bigger our program would run faster than non-tree programs
             path_word = path_2_word(self.board, path)
             if not trie.find_prefix(self.root, path_word)[1]:
                 return ""

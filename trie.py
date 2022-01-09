@@ -1,6 +1,19 @@
+##############################################################################
+# FILE: ex12.py
+# WRITER: Yuval Fishman, yuvalfishman , 325711398. Erel Nahum,
+# EXERCISE: Intro2cs ex12 2021-2022
+# DESCRIPTION:a file that realizes trie of letters
+##############################################################################
+
+##############################################################################
+#                                   Imports                                  #
+##############################################################################
 from typing import Tuple
 
 
+##############################################################################
+#                            TrieNode Class                                  #
+##############################################################################
 class TrieNode(object):
     """
     Our trie node implementation. Very basic. but does the job
@@ -15,6 +28,9 @@ class TrieNode(object):
         self.counter = 1
 
 
+##############################################################################
+#                                 Functions                                  #
+##############################################################################
 def add(root, word: str):
     """
     Adding a word in the trie structure
@@ -70,24 +86,3 @@ def find_prefix(root, prefix: str) -> Tuple[bool, int]:
     # And also the counter of the last node. This indicates how many words have this
     # prefix
     return True, node.counter
-
-
-def find_word(root, word, n=0):
-    if n == len(word):
-        return True
-
-    if not root.children:
-        print(root.char)
-        return False
-
-    letter = word[n]
-
-    found_a_fit = False
-    print(root.char)
-    for child in root.children:
-        # print(child.char)
-        if child.char == letter:
-            print(child.char)
-            found_a_fit = found_a_fit or find_word(child, word, n + 1)
-
-    return found_a_fit
