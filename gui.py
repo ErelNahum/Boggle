@@ -40,8 +40,13 @@ class GUI:
 
     def on_start(self, f):
         f.pack_forget()
-        f = GamePage(self.__root, self.__board, self.__again, self.__q, bg=BGCOLOR)
+        f = GamePage(self.__root, self.__board, self.new_game, bg=BGCOLOR)
         f.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+    def new_game(self, f):
+        f.pack_forget()
+        f = PlayAgainPage(self.__root, self.__again, self.__q)
+        f.pack(**PACK_VARS)
 
     def run(self):
         self.__main_window.mainloop()
@@ -54,16 +59,15 @@ def correct_word(word: str) -> bool:
 
 
 class GamePage(tk.Frame):
-    def __init__(self, root, board, again, q, font=DEFAULT_FONT, **kwargs):
+    def __init__(self, root, board, next, font=DEFAULT_FONT, **kwargs):
         tk.Frame.__init__(self, root, **kwargs)
-        self.__again = again
-        self.__q = q
         self.__root = root
+        self.__next = next
         self.__found = []
         self.__is_first = True
         self.__timer = Timer()
         self.__selected = []
-        root.after(1000, self.tick, self.destroy)
+        root.after(1000, self.tick, next)
         self.__path_s_var = tk.StringVar()
         self.__path_trace = ''
         self.__current_path = tk.Label(root, textvariable=self.__path_s_var, font=DEFAULT_FONT, bg=BGCOLOR)
@@ -86,13 +90,12 @@ class GamePage(tk.Frame):
         self.__score = tk.Label(root, textvariable=self.__score_s_var, font=DEFAULT_FONT, bg=BGCOLOR)
         self.__score.pack(**PACK_VARS)
 
-    def destroy(self) -> None:
-        self.__again()
+
 
     def tick(self, destroy):
         self.__timer.dec()
         if self.__timer.time == 0:
-            destroy()
+            destroy(self)
         self.update_timer()
         self.__root.after(1000, self.tick, destroy)
     
@@ -149,10 +152,6 @@ class GamePage(tk.Frame):
         for coor in coors:
             yield self.__f.buttons[coor[1]][coor[0]]
 
-                
-        
-
-
 
 class WordsListPage(tk.Frame):
     def __init__(self, root, font=DEFAULT_FONT, **kwargs):
@@ -166,7 +165,6 @@ class WordsListPage(tk.Frame):
         self.__lb.insert(self.__next_to_append, word)
         self.__next_to_append += 1
         self.__lb.pack(side=tk.LEFT)
-
 
 
 class GridPage(tk.Frame):
@@ -232,10 +230,10 @@ class PlayAgainPage(tk.Frame):
         l = tk.Label(self, text="GG. Do you want to play again?", font=font, bg=BGCOLOR, fg=TEXTCOLOR)
         l.pack(**PACK_VARS)
 
-        yes = tk.Button(self, text='Play Again', font=font, bg='#c6c1b9', fg=TEXTCOLOR, command=again)
+        yes = tk.Button(self, text='Play Again', font=font, bg='#c6c1b9', fg=TEXTCOLOR, command=lambda: again(self))
         yes.pack(**PACK_VARS)
 
-        no = tk.Button(self, text='Exit', font=font, bg='#c6c1b9', fg=TEXTCOLOR, command=q)
+        no = tk.Button(self, text='Exit', font=font, bg='#c6c1b9', fg=TEXTCOLOR, command=lambda: q(self))
         no.pack(**PACK_VARS)
 
 
