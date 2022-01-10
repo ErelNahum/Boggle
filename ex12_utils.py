@@ -266,7 +266,7 @@ def max_score_paths(board, words, root = None):
     word_max = get_max_len_word(words)
     path_max = len(board) * len(board[0])
     all_paths = []
-    for i in range(min(path_max, word_max)):
+    for i in range(min(path_max, word_max+1)):
         all_paths.extend(find_length_n_paths(i, board, words, root))
         all_paths.extend(find_length_n_words(i, board, words, root))
 
