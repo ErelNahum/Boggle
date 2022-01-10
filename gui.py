@@ -1,27 +1,41 @@
+##############################################################################
+# FILE: ex12.py
+# WRITER: Yuval Fishman, yuvalfishman , 325711398. Erel Nahum, erel, 325177715
+# EXERCISE: Intro2cs ex12 2021-2022
+# DESCRIPTION: this file is responsible for the GUI of the game.
+##############################################################################
+
+##############################################################################
+#                                   Imports                                  #
+##############################################################################
+DICT_FILE = "boggle_dict.txt"
 import copy
 import sys
 import tkinter as tk
 from typing import List
 from PIL import Image, ImageTk
 from gui_helper import Timer, Misc
-from boggle_board_randomizer import randomize_board
 
-DEFAULT_FONT = ('Helvetica', 18)  # tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
+##############################################################################
+#                                 Constants                                  #
+##############################################################################
+DEFAULT_FONT = ('Helvetica', 18)
 BGCOLOR = '#B0C4DE'
 TEXTCOLOR = '#002060'
 BT_COLOR = '#FF9933'
 BT_SELECTED_COLOR = 'gray'
-
 BUTTON_STYLE = {"font": ("Courier", 30),
                 "borderwidth": 1,
                 "relief": tk.RAISED,
                 "bg": BT_COLOR,
                 "activebackground": BT_SELECTED_COLOR}
 
-PACK_VARS = {'side': tk.TOP, 'fill': tk.BOTH, 'expand': True}
+PACK_PARAMS = {'side': tk.TOP, 'fill': tk.BOTH, 'expand': True}
 
 
 class GUI:
+    """the main handler of the gui. create an instance of this class and call the 'run' method."""
+
     def __init__(self, board: List[List[str]], new_game):
         self.__root = tk.Tk()
         self.__root.title('Boggle by Erel & Fishman')
@@ -38,17 +52,20 @@ class GUI:
         f.tkraise()
 
     def on_start(self, f):
+        """switches to the main game page frame"""
         f.pack_forget()
         f = GamePage(self.__root, self.__board, self.end, bg=BGCOLOR)
         f.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
         f.tkraise()
 
     def end(self, f):
+        """switches to the end game titles frame"""
         f.pack_forget()
         f = EndGameFrame(self.__root, self.__new_game, sys.exit)
         f.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
     def run(self):
+        """call this method to start the game"""
         self.__main_window.mainloop()
 
     def destroy(self):
@@ -84,6 +101,8 @@ class WelcomePage(tk.Frame):
 
 
 class GamePage(tk.Frame):
+    """the main game frame. contains a grid frame and a word list frame."""
+
     def __init__(self, root, board, end_f, **kwargs):
         tk.Frame.__init__(self, root, **kwargs)
         self.__root = root
@@ -94,17 +113,18 @@ class GamePage(tk.Frame):
 
         self.gp = GridPage(root, board, self.process_word, bg=BGCOLOR)
         self.gp.focus_set()
-        self.gp.pack(**PACK_VARS)
+        self.gp.pack(**PACK_PARAMS)
 
         self.tl = TimerLabel(root)
         root.after(1000, self.tick)
-        self.tl.pack(**PACK_VARS)
+        self.tl.pack(**PACK_PARAMS)
 
         self.sl = ScoreLabel(root)
-        self.sl.pack(**PACK_VARS)
+        self.sl.pack(**PACK_PARAMS)
 
     def tick(self):
-        if self.tl.tick():
+        """a method that should be called every second to progress the timer."""
+        if self.tl.tick():  # calling the timer 'tick' method, while checking that the game if the game is over.
             self.__root.unbind('<B1-Motion>')
             self.__root.unbind('<ButtonRelease-1>')
             self.__end_f(self)
@@ -112,15 +132,18 @@ class GamePage(tk.Frame):
         self.__root.after(1000, self.tick)
 
     def process_word(self, word, length_of_route):
+        """gets a word and returns if the word is real or not. In the background, it updates the score."""
         if not Misc.correct_word(word):
             return False
         if not self.wlp.already_found(word):
             self.wlp.add_word(word)
-            self.sl.add_score(length_of_route**2)
+            self.sl.add_score(length_of_route ** 2)
         return True
 
 
 class WordsListPage(tk.Frame):
+    """this frame is responsible for saving the correct words."""
+
     def __init__(self, root, font=DEFAULT_FONT, **kwargs):
         tk.Frame.__init__(self, root, **kwargs)
         self.__root = root
@@ -140,6 +163,8 @@ class WordsListPage(tk.Frame):
 
 
 class TracerLabel(tk.Label):
+    """this is a special label that can be updated."""
+
     def __init__(self, root, font=DEFAULT_FONT):
         self.__s_var = tk.StringVar()
         tk.Label.__init__(self, root, textvariable=self.__s_var, font=font)
@@ -149,6 +174,8 @@ class TracerLabel(tk.Label):
 
 
 class GridPage(tk.Frame):
+    """this frame view the board and the tracer label."""
+
     def __init__(self, root, board, process_word, font=DEFAULT_FONT, **kwargs):
         tk.Frame.__init__(self, root, **kwargs)
         self.__root = root
@@ -159,23 +186,26 @@ class GridPage(tk.Frame):
         self.__letters_trace = ''
         self.__selected_coors = []
         self.lab = TracerLabel(root)
-        self.lab.pack(**PACK_VARS)
+        self.lab.pack(**PACK_PARAMS)
 
         self.__process_word = process_word
 
     def select(self, event):
+        """this method is being called when the curser is drag over"""
         widget = self.winfo_containing(event.x_root, event.y_root)
         if isinstance(widget, tk.Button):
             coor = widget.extra
             is_new_word = len(self.__letters_trace) == 0
             if is_new_word or (
-                    coor not in self.__selected_coors and coor in list(Misc.neighbors_in_board(self.__selected_coors[-1]))):
+                    coor not in self.__selected_coors and coor in list(
+                Misc.neighbors_in_board(self.__selected_coors[-1]))):
                 widget['bg'] = 'gray'
                 self.__selected_coors.append(coor)
                 self.__letters_trace += widget.cget('text')
                 self.lab.update_word(self.__letters_trace)
 
     def release(self, event):
+        """this method is being called when the mouse is released."""
         word = self.__letters_trace
         if word:
             correct = self.__process_word(word, len(self.__selected_coors))
@@ -185,6 +215,7 @@ class GridPage(tk.Frame):
         self.lab.update_word('')
 
     def __make_buttons(self, board):
+        """this method creates the buttons and packs them"""
         for i in range(4):
             tk.Grid.columnconfigure(self, i, weight=1)
         for i in range(4):
@@ -197,12 +228,15 @@ class GridPage(tk.Frame):
         return buttons
 
     def __make_button(self, name, r, c):
+        """this method creates a single button"""
         button = tk.Button(self, text=name, **BUTTON_STYLE)
         button.extra = (c, r)
         button.grid(row=r, column=c, sticky=tk.NSEW, padx=10, pady=10)
         return button
 
     def colorize_buttons(self, color, buttons=None):
+        """this method colorizes all the buttons given to the color given. if no buttons are given, it colorizes all
+        buttons """
         if buttons is None:
             for r in self.buttons:
                 for b in r:
@@ -212,6 +246,7 @@ class GridPage(tk.Frame):
                 b.configure(bg=color)
 
     def buttons_of_indices(self, coors):
+        """returns corresponding buttons"""
         for coor in coors:
             yield self.buttons[coor[1]][coor[0]]
 
@@ -221,6 +256,7 @@ class GridPage(tk.Frame):
 
 
 class TimerLabel(tk.Label):
+    """a special label that shows the time left"""
     def __init__(self, root):
         self.__s_var = tk.StringVar()
         self.__timer = Timer()
@@ -234,6 +270,7 @@ class TimerLabel(tk.Label):
 
 
 class ScoreLabel(tk.Label):
+    """a special label that tracks the score"""
     def __init__(self, root):
         self.__score = 0
         self.__s_var = tk.StringVar()
@@ -246,15 +283,16 @@ class ScoreLabel(tk.Label):
 
 
 class EndGameFrame(tk.Frame):
+    """this frame asks the user if he wants to play again or close the game"""
     def __init__(self, root, yes_f, no_f, **kwargs):
         tk.Frame.__init__(self, root, **kwargs)
         self.__root = root
 
         ql = tk.Label(self, text='GG. Do you want to play another game?', font=DEFAULT_FONT, bg=BGCOLOR, fg=TEXTCOLOR)
-        ql.pack(**PACK_VARS)
+        ql.pack(**PACK_PARAMS)
 
         yes = tk.Button(self, text='YES', bg=BT_COLOR, fg=TEXTCOLOR, font=DEFAULT_FONT, command=yes_f)
-        yes.pack(**PACK_VARS)
+        yes.pack(**PACK_PARAMS)
 
         no = tk.Button(self, text='NO', bg=BT_COLOR, fg=TEXTCOLOR, font=DEFAULT_FONT, command=no_f)
-        no.pack(**PACK_VARS)
+        no.pack(**PACK_PARAMS)
