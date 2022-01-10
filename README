@@ -1,1 +1,16 @@
-<Describe your project's features here>
+HELLO!
+We are Yuval Fishman and Erel Nahum and this is our Boggle.
+
+Cool Features:
+    1) top tier design - we designed a custom logo and created a beautiful starting page
+        the opens before the game begins.
+
+    2) dragging instead of clicking - tired of clicking? no more! with the assistant
+        of '<B1-Motion>' feature of tkinter you can now drag of curser over the screen
+        and play quicker and enjoy more.
+
+    3) Touch screen support - we both have touch screen laptops and decided that it'll
+        be super cool if our game supports touch gestures.
+
+We hope you'll enjoy our game!
+Erel Nahum & Yuval Fishman
