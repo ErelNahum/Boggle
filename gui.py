@@ -51,7 +51,6 @@ class GUI:
     def run(self):
         self.__main_window.mainloop()
 
-
     def destroy(self):
         self.__root.destroy()
 
