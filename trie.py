@@ -1,6 +1,6 @@
 ##############################################################################
 # FILE: ex12.py
-# WRITER: Yuval Fishman, yuvalfishman , 325711398. Erel Nahum,
+# WRITER: Yuval Fishman, yuval.fishman , 325711398. Erel Nahum, erel, 325177715
 # EXERCISE: Intro2cs ex12 2021-2022
 # DESCRIPTION:a file that realizes trie of letters
 ##############################################################################

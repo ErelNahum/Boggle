@@ -1,8 +1,5 @@
 import random
-from ex12_utils import *
-import time
 
-DICT_FILE = "boggle_dict.txt"
 BOARD_SIZE = 4
 LETTERS = [
     ['A', 'E', 'A', 'N', 'E', 'G'],
@@ -24,7 +21,6 @@ LETTERS = [
 ]
 
 
-
 def randomize_board(dice_list=LETTERS):
     dice_indices = list(range(len(dice_list)))
     random.shuffle(dice_indices)
@@ -39,18 +35,6 @@ def randomize_board(dice_list=LETTERS):
         board.append(row)
     return board
 
-
-if __name__ == "__main__":
+if __name__=="__main__":
     from pprint import pprint
-    board = randomize_board()
-    for line in board:
-        print(line)
-    # pprint(board)
-
-
-    words = get_word_list(DICT_FILE).split()
-
-    print(max_score_paths(board, words))
-
-
-
+    pprint(randomize_board())
